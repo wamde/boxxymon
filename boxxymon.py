@@ -1,9 +1,12 @@
 import codecs, grpc, os, string
 import rpc_pb2 as ln, rpc_pb2_grpc as lnrpc
-LND_DIR = "/home/wamde/.lnd/"
-macaroon = codecs.encode(open(LND_DIR + 'data/chain/bitcoin/mainnet/admin.macaroon', 'rb').read(), 'hex')
+
+from os.path import expanduser
+
+LND_DIR = expanduser("~/.lnd")
+macaroon = codecs.encode(open(LND_DIR + '/data/chain/bitcoin/mainnet/admin.macaroon', 'rb').read(), 'hex')
 os.environ['GRPC_SSL_CIPHER_SUITES'] = 'HIGH+ECDSA'
-cert = open(LND_DIR + 'tls.cert', 'rb').read()
+cert = open(LND_DIR + '/tls.cert', 'rb').read()
 ssl_creds = grpc.ssl_channel_credentials(cert)
 channel_options = [
             ('grpc.max_message_length', 50 * 1024 * 1024),
