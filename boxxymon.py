@@ -38,7 +38,12 @@ def main():
 			stdscr.addstr(0, 0, get_header_line())
 			channel_line = 2
 			for c in get_channels():
-				stdscr.addstr(channel_line, 0, c.encode("UTF-8"))
+				stdscr.addstr(channel_line, 0, c.encode("UTF-8") + "    ")
+				channel_line += 1
+			stdscr.addstr(channel_line, 0, "-"*10 + " "*40)
+			channel_line += 1
+			for c in get_channels(active_only=False):
+				stdscr.addstr(channel_line, 0, c.encode("UTF-8") + "    ")
 				channel_line += 1
 			stdscr.refresh()
 			time.sleep(10)
@@ -64,17 +69,29 @@ def get_header_line():
 		active_only = True
 		)
 	response = stub.ListChannels(request, metadata=[('macaroon', macaroon)])
-	channels = response.channels
+	active_channels = response.channels
 
-	header += "\n"+("%d active channels" % (len(channels)))
+	request = ln.ListChannelsRequest(
+		inactive_only = True
+		)
+	response = stub.ListChannels(request, metadata=[('macaroon', macaroon)])
+	inactive_channels = response.channels
+
+	header += "\n"+("%d active channels and %d inactive channels" % (len(active_channels), len(inactive_channels)))
 	return header
 
-def get_channels():
+def get_channels(active_only=True):
 
 	# channels
-	request = ln.ListChannelsRequest(
-		active_only = True
-		)
+	if active_only:
+		request = ln.ListChannelsRequest(
+			active_only = True
+			)
+	else:
+		request = ln.ListChannelsRequest(
+			inactive_only = True
+			)
+
 	response = stub.ListChannels(request, metadata=[('macaroon', macaroon)])
 	channels_ = response.channels
 
