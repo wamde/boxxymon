@@ -118,17 +118,17 @@ def get_channels(active_only=True):
 		yield (string.ascii_uppercase[channel_number] + "/ " + str(chan_id) + " "
 			   + node_alias + " "
 			   + channel_cursor(capacity, local_balance, max_capacity, score)
-			   + " " + remote_pubkey)
+			   #+ " " + remote_pubkey
+			   )
 		channel_number += 1
 
 def channel_cursor(capacity, local_balance, max_capacity, score):
-	max_capacity_digits = len("{:,}".format(max_capacity))
+	max_capacity_digits = len("{:,}".format(int(max_capacity/1e3)))
 	num_steps = 20
 	num_pluses = int(num_steps * float(local_balance) / float(capacity))
 	cursor_string = "+"*num_pluses + "-"*(num_steps-num_pluses)
-	balance_string = "(%d/%d sat)" % (local_balance, capacity)
-	balance_string = "({local_balance:>{max_capacity_digits},} / {capacity:>{max_capacity_digits},}), score={score:.3f}".format(
-		local_balance=local_balance, capacity=capacity,
+	balance_string = "({local_balance:>{max_capacity_digits},}k / {capacity:>{max_capacity_digits},}k), score={score:.3f}".format(
+		local_balance=int(local_balance /1e3), capacity=int(capacity /1e3),
 		max_capacity_digits=max_capacity_digits,
 		score=score
 	)
