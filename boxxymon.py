@@ -46,7 +46,7 @@ def main():
 				stdscr.addstr(channel_line, 0, c.encode("UTF-8") + "    ")
 				channel_line += 1
 			stdscr.refresh()
-			time.sleep(10)
+			time.sleep(180)  # 3 minutes
 	finally:
 		curses.echo()
 		curses.nocbreak()
@@ -123,7 +123,7 @@ def get_channels(active_only=True):
 
 def channel_cursor(capacity, local_balance, max_capacity, score):
 	max_capacity_digits = len("{:,}".format(max_capacity))
-	num_steps = 60
+	num_steps = 20
 	num_pluses = int(num_steps * float(local_balance) / float(capacity))
 	cursor_string = "+"*num_pluses + "-"*(num_steps-num_pluses)
 	balance_string = "(%d/%d sat)" % (local_balance, capacity)
