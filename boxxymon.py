@@ -100,25 +100,54 @@ def get_channels(active_only=True):
 	channel_number = 0
 	channels_with_names = {}
 
+
+	request = ln.ForwardingHistoryRequest(
+		start_time=1547436461,
+		end_time=1000000000000,
+		#index_offset=<uint32>,
+		#num_max_events=<uint32>,
+		)
+	response = stub.ForwardingHistory(request, metadata=[('macaroon', macaroon)])
+
+	channel_events = {}
+
+	for event in response.forwarding_events:
+		if str(event.chan_id_in) in channel_events:
+			channel_events[str(event.chan_id_in)]["in"] += 1
+		else:
+			channel_events[str(event.chan_id_in)] = {"in": 1, "out": 0}
+		if str(event.chan_id_out) in channel_events:
+			channel_events[str(event.chan_id_out)]["out"] += 1
+		else:
+			channel_events[str(event.chan_id_out)] = {"in": 0, "out": 1}
+
 	#print "%d active channels" % (len(channels))
 	max_capacity = max([c.capacity for c in channels])
 	for channel in channels:
 		channels_with_names[string.ascii_uppercase[channel_number]] = {"channel": channel}
 		capacity = channel.capacity
 		local_balance = channel.local_balance
-		chan_id = channel.chan_id
+		chan_id = str(channel.chan_id)
 		remote_pubkey = channel.remote_pubkey
 		node_alias = get_node_alias(channel_graph, remote_pubkey)
 		if len(node_alias) >= 15:
 			node_alias = node_alias[:13] + "/"
 		else:
 			node_alias += " "*(15-1-len(node_alias))
+		pass
+
 		score = channel_score(capacity, local_balance)
-                channels_with_names[string.ascii_uppercase[channel_number]]["score"] = score
-		yield (string.ascii_uppercase[channel_number] + "/ " + str(chan_id) + " "
+		channels_with_names[string.ascii_uppercase[channel_number]]["score"] = score
+		if chan_id in channel_events.keys():
+			channel_transactions = "    24h: <- %d, -> %d" % (channel_events[chan_id]["in"], channel_events[chan_id]["out"])
+		else:
+			channel_transactions = " "
+
+		yield (string.ascii_uppercase[channel_number] + "/ " + chan_id + " "
 			   + node_alias + " "
 			   + channel_cursor(capacity, local_balance, max_capacity, score)
 			   #+ " " + remote_pubkey
+			   +  channel_transactions
 			   )
 		channel_number += 1
 
