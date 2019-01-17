@@ -38,12 +38,13 @@ def main():
 			stdscr.addstr(0, 0, get_header_line())
 			channel_line = 2
 			for c in get_channels():
-				stdscr.addstr(channel_line, 0, c.encode("UTF-8") + "    ")
+				#stdscr.addstr(channel_line, 0, c.encode("UTF-8") + "    ")
+				stdscr.addstr(channel_line, 0, c + "    ")
 				channel_line += 1
 			stdscr.addstr(channel_line, 0, "-"*10 + " "*40)
 			channel_line += 1
 			for c in get_channels(active_only=False):
-				stdscr.addstr(channel_line, 0, c.encode("UTF-8") + "    ")
+				stdscr.addstr(channel_line, 0, c + "    ")
 				channel_line += 1
 			stdscr.refresh()
 			time.sleep(180)  # 3 minutes
@@ -139,7 +140,8 @@ def get_channels(active_only=True):
 		local_balance = channel.local_balance
 		chan_id = str(channel.chan_id)
 		remote_pubkey = channel.remote_pubkey
-		node_alias = get_node_alias(channel_graph, remote_pubkey)
+		node_alias = get_node_alias(channel_graph, remote_pubkey).encode("utf8").decode("ascii", "ignore")
+
 		if len(node_alias) >= 15:
 			node_alias = node_alias[:13] + "/"
 		else:
