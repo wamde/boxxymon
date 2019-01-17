@@ -102,8 +102,8 @@ def get_channels(active_only=True):
 
 
 	request = ln.ForwardingHistoryRequest(
-		start_time=1547436461,
-		end_time=1000000000000,
+		start_time=int(time.time() - 24*60*60),
+		end_time=int(time.time() + 24*60*60),
 		#index_offset=<uint32>,
 		#num_max_events=<uint32>,
 		)
@@ -114,12 +114,22 @@ def get_channels(active_only=True):
 	for event in response.forwarding_events:
 		if str(event.chan_id_in) in channel_events:
 			channel_events[str(event.chan_id_in)]["in"] += 1
+			channel_events[str(event.chan_id_in)]["amt_in"] += event.amt_in
+			channel_events[str(event.chan_id_in)]["amt_out"] += event.amt_out
+			channel_events[str(event.chan_id_in)]["fee"] += event.fee
 		else:
-			channel_events[str(event.chan_id_in)] = {"in": 1, "out": 0}
+			channel_events[str(event.chan_id_in)] = {"in": 1, "out": 0,
+													 "amt_in": event.amt_in, "amt_out": event.amt_out,
+													 "fee": event.fee}
 		if str(event.chan_id_out) in channel_events:
 			channel_events[str(event.chan_id_out)]["out"] += 1
+			channel_events[str(event.chan_id_in)]["amt_in"] += event.amt_in
+			channel_events[str(event.chan_id_in)]["amt_out"] += event.amt_out
+			channel_events[str(event.chan_id_in)]["fee"] += event.fee
 		else:
-			channel_events[str(event.chan_id_out)] = {"in": 0, "out": 1}
+			channel_events[str(event.chan_id_out)] = {"in": 0, "out": 1,
+													  "amt_in": event.amt_in, "amt_out": event.amt_out,
+													  "fee": event.fee}
 
 	#print "%d active channels" % (len(channels))
 	max_capacity = max([c.capacity for c in channels])
@@ -140,6 +150,9 @@ def get_channels(active_only=True):
 		channels_with_names[string.ascii_uppercase[channel_number]]["score"] = score
 		if chan_id in channel_events.keys():
 			channel_transactions = "    24h: <- %d, -> %d" % (channel_events[chan_id]["in"], channel_events[chan_id]["out"])
+			channel_transactions += " %d in, %d out, %d fees" % (channel_events[chan_id]["amt_in"],
+																 channel_events[chan_id]["amt_out"],
+																 channel_events[chan_id]["fee"])
 		else:
 			channel_transactions = " "
 
