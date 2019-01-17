@@ -124,9 +124,9 @@ def get_channels(active_only=True):
 													 "fee": event.fee}
 		if str(event.chan_id_out) in channel_events:
 			channel_events[str(event.chan_id_out)]["out"] += 1
-			channel_events[str(event.chan_id_in)]["amt_in"] += event.amt_in
-			channel_events[str(event.chan_id_in)]["amt_out"] += event.amt_out
-			channel_events[str(event.chan_id_in)]["fee"] += event.fee
+			channel_events[str(event.chan_id_out)]["amt_in"] += event.amt_in
+			channel_events[str(event.chan_id_out)]["amt_out"] += event.amt_out
+			channel_events[str(event.chan_id_out)]["fee"] += event.fee
 		else:
 			channel_events[str(event.chan_id_out)] = {"in": 0, "out": 1,
 													  "amt_in": event.amt_in, "amt_out": event.amt_out,
