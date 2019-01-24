@@ -135,7 +135,7 @@ def get_channels(active_only=True):
 	#print "%d active channels" % (len(channels))
 	max_capacity = max([c.capacity for c in channels])
 	for channel in channels:
-		channels_with_names[string.ascii_uppercase[channel_number]] = {"channel": channel}
+		channels_with_names[str(channel_number).rjust(2)] = {"channel": channel}
 		capacity = channel.capacity
 		local_balance = channel.local_balance
 		chan_id = str(channel.chan_id)
@@ -149,7 +149,7 @@ def get_channels(active_only=True):
 		pass
 
 		score = channel_score(capacity, local_balance)
-		channels_with_names[string.ascii_uppercase[channel_number]]["score"] = score
+		channels_with_names[str(channel_number).rjust(2)]["score"] = score
 		if chan_id in channel_events.keys():
 			channel_transactions = "    24h: <- %d, -> %d" % (channel_events[chan_id]["in"], channel_events[chan_id]["out"])
 			channel_transactions += " %d in, %d out, %d fees" % (channel_events[chan_id]["amt_in"],
@@ -158,7 +158,7 @@ def get_channels(active_only=True):
 		else:
 			channel_transactions = " "
 
-		yield (string.ascii_uppercase[channel_number] + "/ " + chan_id + " "
+		yield (str(channel_number).rjust(2) + "/ " + chan_id + " "
 			   + node_alias + " "
 			   + channel_cursor(capacity, local_balance, max_capacity, score)
 			   #+ " " + remote_pubkey
